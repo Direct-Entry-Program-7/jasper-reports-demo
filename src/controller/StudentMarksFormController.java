@@ -9,8 +9,14 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import model.SubjectMarks;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 
 public class StudentMarksFormController {
     public TextField txtId;
@@ -123,7 +129,18 @@ public class StudentMarksFormController {
         txtSubject.requestFocus();
     }
 
-    public void btnPrintReport_OnAction(ActionEvent actionEvent) {
+    public void btnPrintReport_OnAction(ActionEvent actionEvent) throws JRException {
+
+        JasperDesign jasperDesign = JRXmlLoader.load(this.getClass().getResourceAsStream("/report/final-report.jrxml"));
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+        HashMap<String, Object> params = new HashMap<>();
+
+        params.put("id", txtId.getText());
+        params.put("name", txtName.getText());
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, new JRBeanCollectionDataSource(tblMarks.getItems()));
+        JasperViewer.viewReport(jasperPrint, false);
+
     }
 
     public void btnExportReport_OnAction(ActionEvent actionEvent) {
