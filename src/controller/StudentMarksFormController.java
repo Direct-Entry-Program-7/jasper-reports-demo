@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.FileChooser;
 import model.SubjectMarks;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -14,6 +15,7 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.HashMap;
 
@@ -142,7 +144,27 @@ public class StudentMarksFormController {
     }
 
     public void btnPrintReport_OnAction(ActionEvent actionEvent) throws JRException {
+        JasperViewer.viewReport(getJasperPrint(), false);
 
+    }
+
+    public void btnExportReport_OnAction(ActionEvent actionEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Export as");
+        File file = fileChooser.showSaveDialog(txtId.getScene().getWindow());
+
+        if (file == null) return;
+
+        try {
+            JasperExportManager.exportReportToHtmlFile(getJasperPrint(), file.getAbsolutePath());
+            new Alert(Alert.AlertType.INFORMATION, "Exported successfully").show();
+        } catch (JRException e) {
+            new Alert(Alert.AlertType.ERROR, "Failed to export the report").show();
+            e.printStackTrace();
+        }
+    }
+
+    private JasperPrint getJasperPrint() throws JRException {
         JasperDesign jasperDesign = JRXmlLoader.load(this.getClass().getResourceAsStream("/report/final-report.jrxml"));
         JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
         HashMap<String, Object> params = new HashMap<>();
@@ -150,11 +172,6 @@ public class StudentMarksFormController {
         params.put("id", txtId.getText());
         params.put("name", txtName.getText());
 
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, params, new JRBeanCollectionDataSource(tblMarks.getItems()));
-        JasperViewer.viewReport(jasperPrint, false);
-
-    }
-
-    public void btnExportReport_OnAction(ActionEvent actionEvent) {
+        return JasperFillManager.fillReport(jasperReport, params, new JRBeanCollectionDataSource(tblMarks.getItems()));
     }
 }
