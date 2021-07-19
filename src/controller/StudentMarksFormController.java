@@ -2,7 +2,6 @@ package controller;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -41,17 +40,30 @@ public class StudentMarksFormController {
 
         colGrade.setCellValueFactory(param -> {
             BigDecimal marks = param.getValue().getMarks();
-            String grade = "W";
 
-            if (marks.compareTo(new BigDecimal("75")) >= 0) {
-                grade = "A";
-            } else if (marks.compareTo(new BigDecimal("65")) >= 0) {
-                grade = "B";
-            } else if (marks.compareTo(new BigDecimal("55")) >= 0) {
-                grade = "C";
-            } else if (marks.compareTo(new BigDecimal("45")) >= 0) {
-                grade = "S";
-            }
+            /*
+
+            ($F{marks}.compareTo(new java.math.BigDecimal("75")) >= 0) ? "A" :
+                    (($F{marks}.compareTo(new java.math.BigDecimal("65")) >= 0) ? "B" :
+                            (($F{marks}.compareTo(new java.math.BigDecimal("55")) >= 0) ? "C" :
+                                    (($F{marks}.compareTo(new java.math.BigDecimal("45")) >= 0) ? "S" : "W")));
+
+             */
+
+            String grade = (marks.compareTo(new BigDecimal("75")) >= 0) ? "A" :
+                    ((marks.compareTo(new BigDecimal("65")) >= 0) ? "B" :
+                            ((marks.compareTo(new BigDecimal("55")) >= 0) ? "C" :
+                                    ((marks.compareTo(new BigDecimal("45")) >= 0) ? "S" : "W")));
+
+//            if (marks.compareTo(new BigDecimal("75")) >= 0) {
+//                grade = "A";
+//            } else if (marks.compareTo(new BigDecimal("65")) >= 0) {
+//                grade = "B";
+//            } else if (marks.compareTo(new BigDecimal("55")) >= 0) {
+//                grade = "C";
+//            } else if (marks.compareTo(new BigDecimal("45")) >= 0) {
+//                grade = "S";
+//            }
             return new ReadOnlyStringWrapper(grade);
         });
 
@@ -93,7 +105,7 @@ public class StudentMarksFormController {
         txtMarks.setOnAction(this::btnAdd_OnAction);
     }
 
-    private void enableExportAndPrint(){
+    private void enableExportAndPrint() {
         boolean disable = (txtId.getText().trim().isEmpty() || txtName.getText().trim().isEmpty() || tblMarks.getItems().size() == 0);
         btnExportReport.setDisable(disable);
         btnPrintReport.setDisable(disable);
